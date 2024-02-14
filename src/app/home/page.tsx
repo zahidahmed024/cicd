@@ -68,7 +68,7 @@ export default async function Home() {
   // console.log('data---->', data);
   return (
     <div className="flex flex-row justify-center flex-wrap">
-      <h1 className="text-2xl font-bold">Home Page</h1>
+      {/* <h1 className="text-2xl font-bold">Home Page</h1> */}
       <ListView data={data} />
       {/* {data?.map((item: Item) => {
         return (

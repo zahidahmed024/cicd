@@ -1,8 +1,9 @@
 'use client';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Navbar} from '.';
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
+import {getSession} from '@/utils/lib';
 
 interface MenuItem {
   label: string;
@@ -28,6 +29,9 @@ export default function SidebarBody({
 }) {
   const [showSideBar, setShowSideBar] = useState(true);
   const routeName = usePathname();
+  useEffect(() => {
+    //
+  });
   // const currentRoute = router.;
   // console.log('currentRoute', routeName);
   return (
