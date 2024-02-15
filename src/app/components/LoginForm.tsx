@@ -1,27 +1,42 @@
 'use client';
-import {login} from '@/utils/lib';
+import {login, setCookie} from '@/utils/lib';
+import axios from 'axios';
+import {cookies} from 'next/headers';
 import {useRouter} from 'next/navigation';
 // import {redirect} from 'next/navigation';
 import {useState} from 'react';
 
 export default function LoginForm() {
-  const [email, setEmail] = useState('zahid@gmail.com');
+  const [email, setEmail] = useState('zahid1');
   const [password, setPassword] = useState('123456');
   const router = useRouter();
   const handleLogin = async (e: any) => {
     // 'use server';
     // console.log('e', e.target);
     // e.preventDefault();
-    const formData = {
-      email: email,
-      password: password,
-    };
+    // const formData = {
+    //   email: email,
+    //   password: password,
+    // };
     // console.log('formData', formData);
     try {
-      let response = await login(formData);
-      if (response.email) {
-        router.push('/home');
+      const response = await axios.post('http://localhost:3001/login', {
+        name: email,
+        password: password,
+      });
+      console.log('response', response);
+      if (response.status === 200) {
+        setCookie(response.data);
+        router.refresh();
+        // cookies().set('session', response?.data.token || '', {httpOnly: true});
+        // router.push('/home');
+      } else {
+        alert('login failed');
       }
+
+      // let response = await login(formData);
+      // if (response.email) {
+      // }
       // redirect('/');
     } catch (error) {
       console.error(error);

@@ -2,6 +2,8 @@
 import axios from 'axios';
 import React, {useEffect} from 'react';
 import ListView from './components/ListView';
+import UserDetail from './components/UserDetail';
+import {cookies} from 'next/headers';
 
 interface item {
   id: number;
@@ -44,17 +46,37 @@ let data: item[] = [
 ];
 
 async function getData() {
-  const res = await axios.get('https://dummyjson.com/products', {
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache',
-    },
-  });
-  // console.log('res---->', res.data);
-  if (res.status !== 200) {
-    throw new Error('Failed to fetch data');
+  // const res = await axios.get('https://dummyjson.com/products', {
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //     'Cache-Control': 'no-cache',
+  //   },
+  // });
+  // // console.log('res---->', res.data);
+  // if (res.status !== 200) {
+  //   throw new Error('Failed to fetch data');
+  // }
+  // return res.data.products;
+  try {
+    const response = await axios.get('http://localhost:3001/protected', {
+      headers: {
+        Authorization: `Bearer ${cookies().get('session')?.value}`,
+      },
+    });
+    // console.log('response', response);
+    if (response.status === 200) {
+      console.log('response', response.data);
+    } else {
+      alert('login failed');
+    }
+
+    // let response = await login(formData);
+    // if (response.email) {
+    // }
+    // redirect('/');
+  } catch (error) {
+    console.error(error);
   }
-  return res.data.products;
 }
 
 export default async function Home() {
@@ -69,7 +91,8 @@ export default async function Home() {
   return (
     <div className="flex flex-row justify-center flex-wrap">
       {/* <h1 className="text-2xl font-bold">Home Page</h1> */}
-      <ListView data={data} />
+      <UserDetail />
+      {/* <ListView data={data} /> */}
       {/* {data?.map((item: Item) => {
         return (
           <div

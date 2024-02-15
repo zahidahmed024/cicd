@@ -20,21 +20,24 @@ export async function middleware(request: NextRequest) {
     // 2. Check authentication for protected routes
     const session = await getSession();
 
-    if (!publicRoutes.includes(pathname)) {
+    if (!publicRoutes.includes(pathname) && !session) {
       // console.log('session', session);
-      if (!session) {
-        return NextResponse.redirect(new URL('/login', request.url));
-      }
+      // if () {
+      return NextResponse.redirect(new URL('/login', request.url));
+      // }
       // 3. Check user roles or permissions (optional)
       // if (!hasRequiredPermissions(session, pathname)) {
       //   return NextResponse.redirect(new URL('/unauthorized', request.url));
       // }
-    } else if (publicRoutes.includes(pathname)) {
-      if (session) {
-        console.log('session ->', session);
-        return NextResponse.redirect(new URL('/home', request.url));
-      }
+    } else if (publicRoutes.includes(pathname) && session) {
+      // if (session) {
+      console.log('session ->', session);
+      return NextResponse.redirect(new URL('/home', request.url));
+      // }
+    } else if (protectedRoutes.includes(pathname) && !session) {
+      return NextResponse.redirect(new URL('/login', request.url));
     }
+
     // 4. Set or refresh CSRF token for all requests
     // const csrfToken = await getCsrfToken();
     // response.headers.set('x-csrf-token', csrfToken);
