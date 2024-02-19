@@ -1,6 +1,7 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {getSession} from './utils/lib'; // Ensure correct import
-import {cookies} from 'next/headers';
+// import {cookies} from 'next/headers';
+import {deleteCookie, getCookie} from 'cookies-next';
 
 export async function middleware(request: NextRequest) {
   const {pathname} = request.nextUrl;
@@ -10,6 +11,7 @@ export async function middleware(request: NextRequest) {
 
   // Exclude public routes (add or adjust as needed)
   const publicRoutes = ['/', '/login', '/register'];
+  // console.log('getCookie(session)', await getCookie('session'));
 
   try {
     // 1. Check for CSRF token for non-GET requests
@@ -19,9 +21,12 @@ export async function middleware(request: NextRequest) {
 
     // 2. Check authentication for protected routes
     const session = await getSession();
+    // console.log('session', session);
+    // console.log('pathname-', pathname);
 
     if (!publicRoutes.includes(pathname) && !session) {
-      // console.log('session', session);
+      console.log('pathname-', pathname);
+      console.log('session-', session);
       // if () {
       return NextResponse.redirect(new URL('/login', request.url));
       // }
@@ -34,7 +39,11 @@ export async function middleware(request: NextRequest) {
       console.log('session ->', session);
       return NextResponse.redirect(new URL('/home', request.url));
       // }
-    } else if (protectedRoutes.includes(pathname) && !session) {
+    } else if (
+      (protectedRoutes.includes(pathname) || pathname === '/') &&
+      !session
+    ) {
+      console.log('session --->', session);
       return NextResponse.redirect(new URL('/login', request.url));
     }
 
@@ -44,13 +53,15 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next();
   } catch (error) {
-    cookies().set('session', '', {expires: new Date(0)});
-
+    deleteCookie('session');
     console.error('Error in middleware:', error);
     // Handle errors appropriately (e.g., log them, redirect to error page)
   }
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: [
+    '/((?!api|_next/static|public|favicon.ico|next.svg|_next/image|.*\\.png$).*)',
+  ],
+  // matcher: '/((?!api|_next|static|public|favicon.ico).*)',
 };

@@ -1,6 +1,8 @@
 'use client';
-import {login, setCookie} from '@/utils/lib';
+import {setServerCookie} from '@/utils/lib';
+// import {login, setCookie} from '@/utils/lib';
 import axios from 'axios';
+import {setCookie} from 'cookies-next';
 import {cookies} from 'next/headers';
 import {useRouter} from 'next/navigation';
 // import {redirect} from 'next/navigation';
@@ -26,12 +28,14 @@ export default function LoginForm() {
       });
       console.log('response', response);
       if (response.status === 200) {
-        setCookie(response.data);
+        // console.log(response?.data?.token);
+        let session = await setServerCookie(response?.data?.token);
+        console.log('session--->', session);
         router.refresh();
         // cookies().set('session', response?.data.token || '', {httpOnly: true});
         // router.push('/home');
       } else {
-        alert('login failed');
+        // alert('login failed');
       }
 
       // let response = await login(formData);

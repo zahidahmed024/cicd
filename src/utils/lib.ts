@@ -1,4 +1,5 @@
 'use server';
+import {setCookie, getCookie} from 'cookies-next';
 import {SignJWT, jwtVerify} from 'jose';
 import {cookies} from 'next/headers';
 import {NextRequest, NextResponse} from 'next/server';
@@ -42,11 +43,11 @@ export async function login(formData: {email: string; password: string}) {
 
 export async function logout() {
   // Destroy the session
-  cookies().set('session', '', {expires: new Date(0)});
+  await cookies().set('session', '');
 }
 
 export async function getSession() {
-  const session = cookies().get('session')?.value;
+  const session = await cookies().get('session');
   if (!session) return null;
   return true;
 }
@@ -68,6 +69,16 @@ export async function updateSession(request: NextRequest) {
   return res;
 }
 
-export async function setCookie(response: {token: string}) {
-  cookies().set('session', response?.token || '', {httpOnly: true});
+// export async function setCookie(response: {token: string}) {
+//   cookies().set('session', response?.token || '', {httpOnly: true});
+// }
+
+export async function setServerCookie(token: string) {
+  // console.log('token', token);
+  cookies().set('session', token, {httpOnly: true});
+  // return await getSCCookies();
+}
+
+export async function getSCCookies() {
+  return cookies().get('session')?.value || '';
 }

@@ -3,7 +3,9 @@ import axios from 'axios';
 import React, {useEffect} from 'react';
 import ListView from './components/ListView';
 import UserDetail from './components/UserDetail';
-import {cookies} from 'next/headers';
+import {redirect} from 'next/navigation';
+import {deleteCookie, getCookie} from 'cookies-next';
+import apiCaller from '@/utils/apiCaller';
 
 interface item {
   id: number;
@@ -57,25 +59,28 @@ async function getData() {
   //   throw new Error('Failed to fetch data');
   // }
   // return res.data.products;
+  // console.log('getCookie(session)', getCookie('session'));
   try {
-    const response = await axios.get('http://localhost:3001/protected', {
-      headers: {
-        Authorization: `Bearer ${cookies().get('session')?.value}`,
-      },
-    });
+    const response = await apiCaller('http://localhost:3001/protected', 'GET');
     // console.log('response', response);
-    if (response.status === 200) {
-      console.log('response', response.data);
-    } else {
-      alert('login failed');
-    }
-
+    // if (response.status === 200) {
+    //   console.log('response--->', response.data);
+    // } else {
+    //   // alert('login failed');
+    // }
+    return response;
     // let response = await login(formData);
     // if (response.email) {
     // }
     // redirect('/');
   } catch (error) {
-    console.error(error);
+    console.log('error--->', error);
+    // if (error.response.status === 403) {
+    //   // deleteCookie('session');
+    //   // console.log('error', error);
+    //   // redirect('/login'); // history.push('/login');
+    // }
+    // console.error(error);
   }
 }
 
@@ -91,7 +96,7 @@ export default async function Home() {
   return (
     <div className="flex flex-row justify-center flex-wrap">
       {/* <h1 className="text-2xl font-bold">Home Page</h1> */}
-      <UserDetail />
+      <UserDetail user={data} />
       {/* <ListView data={data} /> */}
       {/* {data?.map((item: Item) => {
         return (
