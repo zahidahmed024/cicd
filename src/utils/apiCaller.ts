@@ -1,17 +1,14 @@
 import axios, {AxiosRequestConfig} from 'axios';
-// import {cookies} from 'next/headers';
-// import {redirect} from 'next/navigation';
-import {getSCCookies} from './lib';
-import {logout} from '@/app/actions';
-// import {logout} from './lib';
+import {deleteCookie, getCookie} from 'cookies-next';
+import {cookies} from 'next/headers';
 
 const apiCaller = async (
   url: string,
   method: string,
   data?: any,
 ): Promise<any> => {
-  const token = await getSCCookies(); // Assuming 'token' is the name of the cookie
-  //   console.log('token', token);
+  const token = await getCookie('session', {cookies});
+  console.log('token-->', token);
   const headers: AxiosRequestConfig['headers'] = {
     Authorization: `Bearer ${token}`,
   };
@@ -23,18 +20,32 @@ const apiCaller = async (
     data,
   };
 
+  const instance = axios.create(config);
+
+  instance.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response?.status === 403) {
+        fetch('/api')
+          .then(() => {
+            // Redirect to login page or display relevant message
+            // Here, you can check the response from `/api/logout` (if desired)
+            window.location.href = '/login';
+          })
+          .catch(err => {
+            console.error('Error triggering logout:', err);
+            // Handle any potential errors during the server-side call
+          });
+      }
+      return Promise.reject(error);
+    },
+  );
+
   try {
-    const response = await axios(config);
+    const response = await instance(config);
     return response.data;
   } catch (error: any) {
     console.log(error);
-    if (error.response?.status === 403) {
-      //   cookies().set('session', '', {expires: new Date(0)});
-      await logout();
-      //   redirect('/login');
-      //   await logout();
-      //   redirect('/login');
-    }
     throw new Error(error.response?.data?.message || 'An error occurred');
   }
 };

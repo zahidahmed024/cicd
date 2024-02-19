@@ -29,8 +29,9 @@ export default function LoginForm() {
       console.log('response', response);
       if (response.status === 200) {
         // console.log(response?.data?.token);
-        let session = await setServerCookie(response?.data?.token);
-        console.log('session--->', session);
+        // let session = await setServerCookie(response?.data?.token);
+        // console.log('session--->', session);
+        setCookie('session', response?.data.token || '');
         router.refresh();
         // cookies().set('session', response?.data.token || '', {httpOnly: true});
         // router.push('/home');

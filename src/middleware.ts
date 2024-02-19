@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {getSession} from './utils/lib'; // Ensure correct import
-// import {cookies} from 'next/headers';
+import {cookies} from 'next/headers';
 import {deleteCookie, getCookie} from 'cookies-next';
 
 export async function middleware(request: NextRequest) {
@@ -20,8 +20,8 @@ export async function middleware(request: NextRequest) {
     // }
 
     // 2. Check authentication for protected routes
-    const session = await getSession();
-    // console.log('session', session);
+    const session = getCookie('session', {cookies});
+    console.log('session', session);
     // console.log('pathname-', pathname);
 
     if (!publicRoutes.includes(pathname) && !session) {
